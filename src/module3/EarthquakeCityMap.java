@@ -2,8 +2,6 @@ package module3;
 
 //Java utilities libraries
 import java.util.ArrayList;
-//import java.util.Collections;
-//import java.util.Comparator;
 import java.util.List;
 
 //Processing library
@@ -12,7 +10,6 @@ import processing.core.PApplet;
 //Unfolding libraries
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.marker.Marker;
-import de.fhpotsdam.unfolding.data.Feature;
 import de.fhpotsdam.unfolding.data.PointFeature;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimplePointMarker;
@@ -57,51 +54,30 @@ public class EarthquakeCityMap extends PApplet {
 
 		if (offline) {
 		    map = new UnfoldingMap(this, 200, 50, 700, 500, new MBTilesMapProvider(mbTilesString));
-		    earthquakesURL = "2.5_week.atom"; 	// Same feed, saved Aug 7, 2015, for working offline
+		    //earthquakesURL = "2.5_week.atom"; 	// Same feed, saved Aug 7, 2015, for working offline
 		}
 		else {
 			map = new UnfoldingMap(this, 200, 50, 700, 500, new Google.GoogleMapProvider());
 			// IF YOU WANT TO TEST WITH A LOCAL FILE, uncomment the next line
-			//earthquakesURL = "2.5_week.atom";
+			earthquakesURL = "2.5_week.atom";
 		}
 		
-	    map.zoomToLevel(2);
-	    MapUtils.createDefaultEventDispatcher(this, map);	
+	    MapUtils.createDefaultEventDispatcher(this, map);
 			
 	    // The List you will populate with new SimplePointMarkers
-//	    List<Marker> markers = new ArrayList<Marker>();
+	    List<Marker> markers = new ArrayList<Marker>();
 //
 //	    //Use provided parser to collect properties for each earthquake
 //	    //PointFeatures have a getLocation method
-//	    List<PointFeature> earthquakes = ParseFeed.parseEarthquake(this, earthquakesURL);
+	    List<PointFeature> earthquakes = ParseFeed.parseEarthquake(this, earthquakesURL);
 //	    
 //	    //TODO (Step 3): Add a loop here that calls createMarker (see below) 
 //	    // to create a new SimplePointMarker for each PointFeature in 
 //	    // earthquakes.  Then add each new SimplePointMarker to the 
 //	    // List markers (so that it will be added to the map in the line below)
-//	    Location valLoc = new Location(-38.14f, -73.03f);
-//	    Feature valEq = new PointFeature(valLoc);
-//	    valEq.addProperty("title", "Valdivia, Chile");
-//	    valEq.addProperty("magnitude", "9.5");
-//	    valEq.addProperty("date", "May 22, 1960");
-//	    valEq.addProperty("year", "1960");
-//	    
-//	    int yellow = color(255, 255, 0);
-//	    int gray = color(150, 150, 150);
-//	    
-//	    for(PointFeature eq : earthquakes) {
-//	    	markers.add(new SimplePointMarker(eq.getLocation(), eq.getProperties()));
-//	    }
-//	    Marker valMk = new SimplePointMarker(valLoc, valEq.getProperties());
-//	    markers.add(valMk);
-//	    
-//	    for(Marker mks: markers) {
-//	    	if((int) mks.getProperty("year") > 2000) {
-//	    		mks.setColor(yellow);
-//	    	} else {
-//	    		mks.setColor(gray);
-//	    	}
-//	    }
+	    for(PointFeature pf : earthquakes) {
+	    	markers.add(createMarker(pf));
+	    }
 	    
 	    PointFeature valdiviaEq = new PointFeature(new Location(-38.14f,-73.03f));
 	    valdiviaEq.addProperty("title", "Valdivia, Chile");
@@ -121,38 +97,34 @@ public class EarthquakeCityMap extends PApplet {
 	    sumatraEq.addProperty("date", "February 26, 2004");
 	    sumatraEq.addProperty("year", 2004);
 
-	    
 	    PointFeature japanEq = new PointFeature(new Location(38.322f,142.369f));
 	    japanEq.addProperty("title", "Near the East Coast of Honshu, Japan");
 	    japanEq.addProperty("magnitude", "9.0");
 	    japanEq.addProperty("date", "March 11, 2011");
 	    japanEq.addProperty("year", 2011);
 
-	    
 	    PointFeature kamchatkaEq = new PointFeature(new Location(52.76f,160.06f));
 	    kamchatkaEq.addProperty("title", "Kamchatka");
 	    kamchatkaEq.addProperty("magnitude", "9.0");
 	    kamchatkaEq.addProperty("date", "November 4, 1952");
 	    kamchatkaEq.addProperty("year", 1952);
 
-	    
 	    List<PointFeature> bigEarthquakes = new ArrayList<PointFeature>();
 	    bigEarthquakes.add(valdiviaEq);
 	    bigEarthquakes.add(alaskaEq);
 	    bigEarthquakes.add(sumatraEq);
 	    bigEarthquakes.add(japanEq);
 	    bigEarthquakes.add(kamchatkaEq);
-//	    
-	    List<Marker> markers = new ArrayList<Marker>();
+
+
 	    for (PointFeature eq: bigEarthquakes) {
 	    	markers.add(new SimplePointMarker(eq.getLocation(), eq.getProperties()));
 	    }
-
-
+	    
 	    int yellow = color(255, 255, 0);
 	    int gray = color(150,150,150);
 	    
-	    for (Marker mk :markers) {
+	    for (Marker mk : markers) {
 	    	if ( (int) mk.getProperty("year") > 2000 ) {
 	    		mk.setColor(yellow);
 	    	}
@@ -179,11 +151,14 @@ public class EarthquakeCityMap extends PApplet {
 		// To print all of the features in a PointFeature (so you can see what they are)
 		// uncomment the line below.  Note this will only print if you call createMarker 
 		// from setup
-		//System.out.println(feature.getProperties());
+		System.out.println(feature.getProperties());
 		
 		// Create a new SimplePointMarker at the location given by the PointFeature
-		SimplePointMarker marker = new SimplePointMarker(feature.getLocation());
-		
+		SimplePointMarker marker = new SimplePointMarker();
+		if(feature.getProperties() != null) {
+			marker.setLocation(feature.getLocation());
+			marker.setProperties(feature.getProperties());
+		}
 		Object magObj = feature.getProperty("magnitude");
 		float mag = Float.parseFloat(magObj.toString());
 		
@@ -199,7 +174,13 @@ public class EarthquakeCityMap extends PApplet {
 	    // Rather than comparing the magnitude to a number directly, compare 
 	    // the magnitude to these variables (and change their value in the code 
 	    // above if you want to change what you mean by "moderate" and "light")
-	    
+
+    	if ( mag > 4 ) {
+    		marker.setColor(yellow);
+    	}
+    	else {
+    		marker.setColor(gray);
+    	}
 	    
 	    // Finally return the marker
 	    return marker;
