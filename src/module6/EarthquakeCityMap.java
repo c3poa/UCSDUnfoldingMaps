@@ -105,7 +105,7 @@ public class EarthquakeCityMap extends PApplet {
 			provider3 = new OpenStreetMap.OpenStreetMapProvider();
 			// IF YOU WANT TO TEST WITH A LOCAL FILE, uncomment the next line
 			//earthquakesURL = "2.5_week.atom";
-			//			earthquakesURL = "quiz2.atom";
+						earthquakesURL = "quiz2.atom";
 		}
 		map = new UnfoldingMap(this, 200, 50, 650, 600, provider1);
 		MapUtils.createDefaultEventDispatcher(this, map);

@@ -12,7 +12,7 @@ import processing.core.PGraphics;
 // TODO: Implement the comparable interface
 public abstract class EarthquakeMarker extends CommonMarker implements Comparable<EarthquakeMarker>
 {
-	
+
 	// Did the earthquake occur on land?  This will be set by the subclasses.
 	protected boolean isOnLand;
 
@@ -21,11 +21,11 @@ public abstract class EarthquakeMarker extends CommonMarker implements Comparabl
 	// using the thresholds below, or a continuous function
 	// based on magnitude. 
 	protected float radius;
-	
-	
+
+
 	// constants for distance
 	protected static final float kmPerMile = 1.6f;
-	
+
 	/** Greater than or equal to this threshold is a moderate earthquake */
 	public static final float THRESHOLD_MODERATE = 5;
 	/** Greater than or equal to this threshold is a light earthquake */
@@ -38,11 +38,11 @@ public abstract class EarthquakeMarker extends CommonMarker implements Comparabl
 
 	// ADD constants for colors
 
-	
+
 	// abstract method implemented in derived classes
 	public abstract void drawEarthquake(PGraphics pg, float x, float y);
-		
-	
+
+
 	// constructor
 	public EarthquakeMarker (PointFeature feature) 
 	{
@@ -54,25 +54,26 @@ public abstract class EarthquakeMarker extends CommonMarker implements Comparabl
 		setProperties(properties);
 		this.radius = 1.75f*getMagnitude();
 	}
-	
+
 	// calls abstract method drawEarthquake and then checks age and draws X if needed
 	@Override
 	public void drawMarker(PGraphics pg, float x, float y) {
 		// save previous styling
 		pg.pushStyle();
-			
+
 		// determine color of marker from depth
 		colorDetermine(pg);
-		
+
 		// call abstract method implemented in child class to draw marker shape
 		drawEarthquake(pg, x, y);
-		
+
 		// IMPLEMENT: add X over marker if within past day		
 		String age = getStringProperty("age");
 		if ("Past Hour".equals(age) || "Past Day".equals(age)) {
-			
+
 			pg.strokeWeight(2);
 			int buffer = 2;
+			pg.stroke(0);
 			pg.line(x-(radius+buffer), 
 					y-(radius+buffer), 
 					x+radius+buffer, 
@@ -81,36 +82,31 @@ public abstract class EarthquakeMarker extends CommonMarker implements Comparabl
 					y+(radius+buffer), 
 					x+radius+buffer, 
 					y-(radius+buffer));
-			
+
 		}
-		
+
 		// reset to previous styling
 		pg.popStyle();
-		
+
 	}
 
 	/** Show the title of the earthquake if this marker is selected */
 	public void showTitle(PGraphics pg, float x, float y)
 	{
 		String title = getTitle();
+		float width = pg.textWidth(title);
 		pg.pushStyle();
-		
 		pg.rectMode(PConstants.CORNER);
-		
-		pg.stroke(110);
-		pg.fill(255,255,255);
-		pg.rect(x, y + 15, pg.textWidth(title) +6, 18, 5);
-		
+		pg.fill(255);
+		pg.textSize(12);
+		pg.rect(x+15, y-8, width + 12, 20, 5, 5, 5, 5);
 		pg.textAlign(PConstants.LEFT, PConstants.TOP);
-		pg.fill(0);
-		pg.text(title, x + 3 , y +18);
-		
-		
+		pg.fill(20, 24, 35);
+		pg.text(title, x+22, y - 5);
 		pg.popStyle();
-		
 	}
 
-	
+
 	/**
 	 * Return the "threat circle" radius, or distance up to 
 	 * which this earthquake can affect things, for this earthquake.   
@@ -142,8 +138,8 @@ public abstract class EarthquakeMarker extends CommonMarker implements Comparabl
 			pg.stroke(255, 0, 0, 150);
 		}
 	}
-	
-	
+
+
 	/** toString
 	 * Returns an earthquake marker's string representation
 	 * @return the string representation of an earthquake marker.
@@ -155,42 +151,30 @@ public abstract class EarthquakeMarker extends CommonMarker implements Comparabl
 	/*
 	 * getters for earthquake properties
 	 */
-	
+
 	public float getMagnitude() {
 		return Float.parseFloat(getProperty("magnitude").toString());
 	}
-	
+
 	public float getDepth() {
 		return Float.parseFloat(getProperty("depth").toString());	
 	}
-	
+
 	public String getTitle() {
 		return (String) getProperty("title");	
-		
+
 	}
-	
+
 	public float getRadius() {
 		return Float.parseFloat(getProperty("radius").toString());
 	}
-	
+
 	public boolean isOnLand()
 	{
 		return isOnLand;
 	}
 
-
-	@Override
-	public int compareTo(EarthquakeMarker o) {
-		if(this.getMagnitude() > o.getMagnitude()) {
-			return 1;
-		} else if(this.getMagnitude() < o.getMagnitude()) {
-			return -1;
-		} else {
-			return 0;
-		}
+	public int compareTo(EarthquakeMarker marker) {
+		return Float.compare(marker.getMagnitude(), this.getMagnitude());
 	}
-	
-	
-	
-	
 }
