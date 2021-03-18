@@ -55,10 +55,6 @@ public abstract class EarthquakeMarker extends CommonMarker implements Comparabl
 		this.radius = 1.75f*getMagnitude();
 	}
 	
-	// TODO: Add the method:
-	// public int compareTo(EarthquakeMarker marker)
-	
-	
 	// calls abstract method drawEarthquake and then checks age and draws X if needed
 	@Override
 	public void drawMarker(PGraphics pg, float x, float y) {
@@ -127,20 +123,23 @@ public abstract class EarthquakeMarker extends CommonMarker implements Comparabl
 		double km = (miles * kmPerMile);
 		return km;
 	}
-	
+
 	// determine color of marker from depth
 	// We use: Deep = red, intermediate = blue, shallow = yellow
 	private void colorDetermine(PGraphics pg) {
 		float depth = getDepth();
-		
+
 		if (depth < THRESHOLD_INTERMEDIATE) {
 			pg.fill(255, 255, 0);
+			pg.stroke(255, 255, 0, 150);
 		}
 		else if (depth < THRESHOLD_DEEP) {
 			pg.fill(0, 0, 255);
+			pg.stroke(0, 0, 255, 150);
 		}
 		else {
 			pg.fill(255, 0, 0);
+			pg.stroke(255, 0, 0, 150);
 		}
 	}
 	
